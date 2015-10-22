@@ -4,6 +4,6 @@
 // Fill in WiFiSSID with the WiFi network name and the
 // WiFiPSK with the password.
 
-const char WiFiSSID[] = "Anakins_Cave";
-const char WiFiPSK[] = "Zoecanhascheeseburger";
+const char WiFiSSID[] = "Your WiFi name";
+const char WiFiPSK[] = "Your WiFi password";
 

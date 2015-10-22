@@ -15,6 +15,6 @@
 // the above site) and put the keys here.
 
 const char PhantHost[] = "data.sparkfun.com";
-const char PublicKey[] = "XGbO51WDmzhQVL3bRxRX";
-const char PrivateKey[] = "1JxVoqnB1eFE6Xz7AyAv";
+const char PublicKey[] = "put key here";
+const char PrivateKey[] = "put key here";
 
