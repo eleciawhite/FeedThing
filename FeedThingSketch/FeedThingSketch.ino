@@ -22,8 +22,8 @@ const int LED_PIN = 5; // Thing's onboard, green LED, it is the same line as the
 const int ANALOG_PIN = A0; // The only analog pin on the Thing, max input volatage is 1V
 
 const int LOW_BATTERY_INDICATOR_PIN = 4; // Low battery indicator from the boost
-const int PHOTO_INTERRUPTER_PIN = 13; // Digital pin to be read
-const int BOOST_OUTPUT_PIN = 0; // Turn on the boost power for the motor
+const int PHOTO_INTERRUPTER_PIN = 12; // Digital pin to be read
+const int BOOST_OUTPUT_PIN = 13; // Turn on the boost power for the motor
 
 /////////////////////////////////////
 // Motor setup                     //
@@ -39,7 +39,8 @@ Adafruit_StepperMotor *gPtrToStepper = gMotorShield.getStepper(MOTOR_STEPS_PER_R
 /////////////////////////////////////
 const char* errorBatteryLowString = "Battery low";
 const char* errorDispensorEmptyString = "Dispensor empty";
-const char * noErrorString = "";
+const char* noErrorTimedWakeup = "We're all fine here.";
+const char* noErrorString = "";
 
 
 /////////////////////////////////////
@@ -66,7 +67,7 @@ void enterSleep()
   // will not return after this, system will reset and start with setup()
   // deepSleep time is defined in microseconds. 
   // Multiply seconds by 1e6 to get microseconds.
-  const int sleepTimeS = 100;
+  const int sleepTimeS = 600;
   ESP.deepSleep(sleepTimeS * 1000000);
 }
 
@@ -74,11 +75,17 @@ void setup()
 {
   initHardware();
   debugOutputLn("HW init complete");
-  connectWiFi();
-  debugOutputLn("Connect WiFi");
+  feedAndPost();
+  enterSleep();  
 }
 
+
 void loop() 
+{
+  // do nothing, should never get here due to sleeping
+}
+
+void feedAndPost() 
 {
   int batteryIndicator = -1; // unknown
   const char ** errorStringPtr;
@@ -87,31 +94,38 @@ void loop()
   // The motor can only go so many times before we decide we are out of food
   const unsigned int MAX_NUMBER_MOTOR_INCREMENTS = 10; 
   unsigned int numMotorTurns = 0;
-  // turnBoostOn();
+  turnBoostOn();
   while (noFoodAvailable() && numMotorTurns < MAX_NUMBER_MOTOR_INCREMENTS) {
     turnMotorOneIncrement();
     numMotorTurns++;
+    debugOutputLn("Turning motor...");
+  }
+
+  if (numMotorTurns) {
+    if (numMotorTurns >= MAX_NUMBER_MOTOR_INCREMENTS){
+      errorStringPtr = &errorDispensorEmptyString;
+    } 
+  } else { // timed wakeup, nothing really going on
+    errorStringPtr = &noErrorTimedWakeup;    
   }
   
   // check battery at the worst part and while boost is still on to give us a value
+  debugOutputLn("Checking battery...");
   if (batteryIsGood()) { 
     batteryIndicator = 1;
   } else {
     batteryIndicator = 0;
     errorStringPtr = &errorBatteryLowString;
   }    
-  // turnBoostOff();
-  delay(2000); // FIXME: would be nice if this was a light sleep
-  // FIXME: turn on WiFi and post to phant here
+  turnBoostOff();
+
+  // turn on WiFi and post to phant here
+  connectWiFi();
+  debugOutputLn("Connected to WiFi");
   
-  if (numMotorTurns) {
-    if (numMotorTurns >= MAX_NUMBER_MOTOR_INCREMENTS){
-      errorStringPtr = &errorDispensorEmptyString;
-    } 
-    waitWhilePostToPhant(numMotorTurns, batteryIndicator, *errorStringPtr);
-  }
-  // now go to sleep
-  
+  waitWhilePostToPhant(numMotorTurns, batteryIndicator, *errorStringPtr);
+  debugOutputLn("Posted data");
+
 }
 
 void connectWiFi()
