@@ -67,7 +67,7 @@ void enterSleep()
   // will not return after this, system will reset and start with setup()
   // deepSleep time is defined in microseconds. 
   // Multiply seconds by 1e6 to get microseconds.
-  const int sleepTimeS = 600;
+  const int sleepTimeS = -1; // oFIXME: sleep doesn't work so sleep forever
   ESP.deepSleep(sleepTimeS * 1000000);
 }
 
