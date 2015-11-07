@@ -391,7 +391,6 @@ NPN BJT<y:LabelModel>
       </data>
     </node>
     <node id="n20">
-      <data key="d5"/>
       <data key="d6">
         <y:ShapeNode>
           <y:Geometry height="142.48420958010007" width="419.0" x="625.3854428159999" y="555.0"/>
@@ -406,6 +405,20 @@ To program the board:
 - Connect D0 to ground
 - Connect serial port to Thing
 - Make sure you are providing 5V (plug in boost to USB)
+</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n21">
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="63.24210479005001" width="216.0" x="715.4999999999999" y="107.75789520995"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="48.103515625" modelName="internal" modelPosition="tl" textColor="#000000" visible="true" width="202.76171875" x="4.0" y="4.0">For additional power savings (5mA),
+remove R13 on boost circuit so Thing
+can control the boost cirrcuit.
 </y:NodeLabel>
           <y:Shape type="rectangle"/>
         </y:ShapeNode>

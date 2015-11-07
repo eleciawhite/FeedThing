@@ -59,23 +59,31 @@ void turnMotorOneIncrement()
   const int STEPS_TO_INCREMENT = 64;
   gPtrToStepper->step(STEPS_TO_INCREMENT/2,FORWARD,DOUBLE);
   gPtrToStepper->step(STEPS_TO_INCREMENT,BACKWARD,DOUBLE);
-  gPtrToStepper->release();
 }
 
 void enterSleep()
 {
   // will not return after this, system will reset and start with setup()
   // deepSleep time is defined in microseconds. 
-  // Multiply seconds by 1e6 to get microseconds.
-  const int sleepTimeS = -1; // oFIXME: sleep doesn't work so sleep forever
-  ESP.deepSleep(sleepTimeS * 1000000);
+  // (Multiply seconds by 1000000 to get microseconds.)
+  // XPD to DTR OR'd with PI doesn't work so sleep forever here, 
+  // photo interrupter will wake us up
+  const int sleepTimeS = -1;   
+  gPtrToStepper->release(); // motor to sleep
+  ESP.deepSleep(sleepTimeS);
 }
 
 void setup() 
 {
   initHardware();
   debugOutputLn("HW init complete");
-  feedAndPost();
+  
+  while (feedAndPostSuccessful() && noFoodAvailable()) 
+    { ; } // spin until feed area is full (unless there is an error)
+          // note: we usually only go through that once but if the food
+          // is taken while we are posting the data, we may need to go 
+          // again
+          
   enterSleep();  
 }
 
@@ -85,8 +93,9 @@ void loop()
   // do nothing, should never get here due to sleeping
 }
 
-void feedAndPost() 
+bool feedAndPostSuccessful() 
 {
+  bool actionSuccessful = true; // successful until something goes wrong
   int batteryIndicator = -1; // unknown
   const char ** errorStringPtr;
   errorStringPtr = &noErrorString;
@@ -104,6 +113,7 @@ void feedAndPost()
   if (numMotorTurns) {
     if (numMotorTurns >= MAX_NUMBER_MOTOR_INCREMENTS){
       errorStringPtr = &errorDispensorEmptyString;
+      actionSuccessful = false;
     } 
   } else { // timed wakeup, nothing really going on
     errorStringPtr = &noErrorTimedWakeup;    
@@ -120,12 +130,13 @@ void feedAndPost()
   turnBoostOff();
 
   // turn on WiFi and post to phant here
+  debugOutputLn(F("Posting data..."));
   connectWiFi();
   debugOutputLn("Connected to WiFi");
   
   waitWhilePostToPhant(numMotorTurns, batteryIndicator, *errorStringPtr);
   debugOutputLn("Posted data");
-
+  return actionSuccessful; 
 }
 
 void connectWiFi()

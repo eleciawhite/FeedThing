@@ -31,6 +31,8 @@
 
 #define PCA9685_MODE1 0x0
 #define PCA9685_PRESCALE 0xFE
+#define PCA9685_MODE1_SLEEP 0x10
+#define PCA9685_MODE1_RESTART 0x80
 
 #define LED0_ON_L 0x6
 #define LED0_ON_H 0x7
@@ -48,6 +50,7 @@ class Adafruit_PWMServoDriver {
   Adafruit_PWMServoDriver(uint8_t addr = 0x40);
   void begin(void);
   void reset(void);
+  void sleep(void);
   void setPWMFreq(float freq);
   void setPWM(uint8_t num, uint16_t on, uint16_t off);
 

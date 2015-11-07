@@ -34,7 +34,11 @@ void Adafruit_PWMServoDriver::begin(void) {
 
 
 void Adafruit_PWMServoDriver::reset(void) {
- write8(PCA9685_MODE1, 0x0);
+ write8(PCA9685_MODE1, PCA9685_MODE1_RESTART);
+}
+
+void Adafruit_PWMServoDriver::sleep(void) {
+ write8(PCA9685_MODE1, PCA9685_MODE1_SLEEP);
 }
 
 void Adafruit_PWMServoDriver::setPWMFreq(float freq) {
@@ -50,7 +54,7 @@ void Adafruit_PWMServoDriver::setPWMFreq(float freq) {
   Serial.print("Final pre-scale: "); Serial.println(prescale);  
   
   uint8_t oldmode = read8(PCA9685_MODE1);
-  uint8_t newmode = (oldmode&0x7F) | 0x10; // sleep
+  uint8_t newmode = (oldmode&0x7F) | PCA9685_MODE1_SLEEP; 
   write8(PCA9685_MODE1, newmode); // go to sleep
   write8(PCA9685_PRESCALE, prescale); // set the prescaler
   write8(PCA9685_MODE1, oldmode);

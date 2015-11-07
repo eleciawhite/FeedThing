@@ -86,6 +86,7 @@ class Adafruit_MotorShield
     Adafruit_MotorShield(uint8_t addr = 0x60);
     friend class Adafruit_DCMotor;
     void begin(uint16_t freq = 1600);
+	void sleep();
 
     void setPWM(uint8_t pin, uint16_t val);
     void setPin(uint8_t pin, boolean val);

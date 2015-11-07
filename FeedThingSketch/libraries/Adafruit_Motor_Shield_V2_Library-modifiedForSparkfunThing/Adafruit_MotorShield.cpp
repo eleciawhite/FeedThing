@@ -50,6 +50,9 @@ void Adafruit_MotorShield::begin(uint16_t freq) {
   for (uint8_t i=0; i<16; i++) 
     _pwm.setPWM(i, 0, 0);
 }
+void Adafruit_MotorShield::sleep() {
+  _pwm.sleep();
+}
 
 void Adafruit_MotorShield::setPWM(uint8_t pin, uint16_t value) {
   if (value > 4095) {
@@ -213,6 +216,7 @@ void Adafruit_StepperMotor::release(void) {
   MC->setPin(BIN2pin, LOW);
   MC->setPWM(PWMApin, 0);
   MC->setPWM(PWMBpin, 0);
+  MC->sleep();
 }
 
 void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
